@@ -1,0 +1,95 @@
+GROUP MEMBERS:
+1. RAY VINCENT D.S CONCEPCION
+2. JOEVIN C. ANSOC
+3. RANDOLF MARIE G. MARBA
+
+# Elevator Simulation Documentation
+
+## Project Overview
+This application simulates the operation of multiple elevators in a building with configurable parameters. The simulation provides comprehensive insights into elevator performance, passenger wait times, and overall system efficiency metrics.
+
+## System Architecture
+The simulation is implemented as a web application using Flask for the backend and HTML/JavaScript for the frontend visualization. The core components include:
+
+1. Web Server: Flask application that serves the dashboard and provides RESTful endpoints.
+2. Simulation Engine: Manages the state of the simulation, including elevators, passengers, and building.
+3. Elevator Scheduler: Implements the algorithms for dispatching elevators to service passenger requests.
+4. Data Models: Define the core objects used in the simulation (Elevator, Passenger, Building).
+
+## Components
+
+### Main Application (main.py)
+The main application file contains the Flask web server and simulation entry points. It handles HTTP requests, manages the simulation thread, and provides status updates to the frontend. The Flask routes enable users to start/stop the simulation and retrieve current system status.
+
+### Scheduler (scheduler.py)
+The scheduler implements the logic for assigning elevators to passenger requests. It uses a destination dispatch algorithm to optimize elevator movements and minimize passenger wait times. The scheduler also tracks simulation statistics and manages the movement of elevators between floors.
+
+### Models (models.py)
+This module defines the data structures for the core simulation objects:
+- Elevator: Represents an elevator car with properties such as capacity, current floor, and direction.
+- Passenger: Represents a person with source floor, destination floor, and timing metrics.
+
+## Class Relationships
+- Simulation initializes a Building with multiple Elevators
+- Building contains Elevators and floor queues of Passengers
+- Scheduler manages Elevators and assigns them to service Passengers
+
+## Algorithms
+
+### Passenger Generation
+Passengers are generated randomly using statistical distributions:
+- Arrival times follow an exponential distribution based on the mean arrival rate
+- Destination floors follow a normal distribution centered around the middle floor
+
+### Elevator Dispatching
+The system uses a destination dispatch algorithm:
+1. If an idle elevator exists (no stops and no passengers), assign it to the call
+2. Otherwise, choose the elevator with available capacity that minimizes:
+   - The distance to the call floor
+   - The current number of scheduled stops
+
+### Elevator Movement
+Elevators move towards their target floors in a continuous loop:
+1. Determine the next target floor based on current stops and direction
+2. Move one floor towards that target
+3. When reaching a target floor:
+   - Disembark passengers whose destination is this floor
+   - Board waiting passengers within capacity limits
+   - Apply appropriate stop delays based on boarding/disembarking activity
+
+## Configuration Options
+The simulation supports configuration of the following parameters:
+- Number of floors in the building
+- Number of elevators
+- Elevator capacity
+- Mean passenger arrival rate
+- Simulation speed
+
+## Usage Instructions
+1. Start the application by executing `py app.py`
+2. Access the dashboard at http://localhost:5000/
+3. Configure simulation parameters as needed
+4. Use the dashboard controls to start/stop the simulation
+5. Monitor real-time metrics and elevator movements
+
+## Statistics and Metrics
+The simulation collects key performance indicators:
+- Total passengers served
+- Average wait time (time from request to boarding)
+- Average journey time (time from boarding to disembarking)
+- Elevator utilization
+
+## Implementation Details
+
+### Concurrency
+The simulation uses Python threading library to:
+- Run the simulation in a background thread
+- Move each elevator independently
+- Generate passengers on a separate thread
+- Thread synchronization is handled using locks to prevent race conditions
+
+### Time Management
+The simulation can run at different speeds controlled by:
+- Base tick intervals (typically 0.5 seconds)
+- Speed multiplier (faster/slower than real-time)
+- Stop delays proportional to passenger activity
